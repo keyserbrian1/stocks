@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+{%load trading%}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <style media="screen">
+      .asks, .bids{
+        width: 48%;
+      }
+      .trades{
+        width: 400px;
+        float: right;
+      }
+      div{
+        display: inline-block;
+        vertical-align: top;
+      }
+    </style>
+    <script type="text/javascript">
+    function updateAsks(asks_data){
+      asks = {}
+      for (var val of asks_data){
+        asks[Number(val.price)] = (asks[Number(val.price)]||0)+Number(val.shares)
+      }
+      var asks_table = ""
+      var asks_prices = Object.keys(asks)
+      asks_prices.sort(function(a, b) {
+        return a - b;
+      });
+      for (var price of asks_prices){
+        asks_table += "<tr><td>$"+Number(price).toFixed(2)+"</td><td>"+asks[price]+"</td></tr>\n"
+      }
+      $("#asksbody").html(asks_table)
+      $(".askswait").hide()
+      updatePrices()
+      setTimeout(getAsks, 10000)
+    }
+
+    function getAsks(){
+      $(".askswait").show()
+      $.get({
+        url:window.location.href+'asks',
+        success:updateAsks
+      })
+
+    }
+
+    function updateBids(bids_data){
+      bids = {}
+      for (var val of bids_data){
+        bids[Number(val.price)] = (bids[Number(val.price)]||0)+Number(val.shares)
+      }
+      var bids_table = ""
+      var bids_prices = Object.keys(bids)
+      bids_prices.sort(function(a, b) {
+        return b - a;
+      });
+      for (var price of bids_prices){
+        bids_table += "<tr><td>$"+Number(price).toFixed(2)+"</td><td>"+bids[price]+"</td></tr>\n"
+      }
+        $("#bidsbody").html(bids_table)
+      if (bids_table){
+        $(".bidsnone").hide()
+      } else {
+        $(".bidsnone").show()
+      }
+      $(".bidswait").hide()
+      updatePrices()
+      setTimeout(getBids, 10000)
+    }
+
+    function getBids(){
+      $(".bidswait").show()
+      $.get({
+        url:window.location.href+'bids',
+        success:updateBids
+      })
+    }
+
+    function updateOrders(orders_data){
+      orders = orders_data
+      var orders_table = ""
+      for (var order of orders){
+        order.price = Number(order.price)
+        orders_table += "<tr><td>"+(order.buy_order?"Buy":"Sell")+"</td><td>"+order.shares+"</td><td>$"+order.price.toFixed(2)+"</td><td>$"+(order.shares*order.price).toFixed(2)+"</td><td>"+order.created_at+"</td><td>"+'<a href="../../orders/'+order.id+'/cancel">Cancel Order</a>'+"</td></tr>\n"
+      }
+        $("#ordersbody").html(orders_table)
+      if (orders_table){
+        $(".ordersnone").hide()
+      } else {
+        $(".ordersnone").show()
+      }
+      $(".orderswait").hide()
+      updatePrices()
+      setTimeout(getOrders, 10000)
+    }
+
+    function getOrders(){
+      $(".orderswait").show()
+      $.get({
+        url:window.location.href+'user',
+        success:updateOrders
+      })
+    }
+
+    function updatePrices(){
+      $('input[type="submit"]').removeAttr('disabled');
+      var type=$("#type").val();
+      var price=Number($("#price").val());
+      var shares=Number($("#shares").val());
+      var originalShares = shares
+
+      if (!type||!price||!shares||typeof asks=="undefined"||typeof bids=="undefined"||typeof orders=="undefined"){
+        $("#total").val("");
+        $("#pricingnotice").text("");
+        $('input[type="submit"]').attr('disabled','disabled');
+        return;
+      }
+      var total = 0;
+      var i = 0;
+      bids_prices = Object.keys(bids)
+      bids_prices.sort(function(a, b) {
+        return b - a;
+      });
+      asks_prices = Object.keys(asks)
+      asks_prices.sort(function(a, b) {
+        return a - b;
+      });
+      message = ""
+      if (type==("buy")){
+        while(shares){
+          if (price < asks_prices[i] || !asks_prices[i]){
+            total += shares*price
+            break;
+          }
+          if (shares<asks[asks_prices[i]]){
+            total += asks_prices[i]*shares
+            break;
+          } else {
+            shares -= asks[asks_prices[i]]
+            total += asks[asks_prices[i]]*asks_prices[i]
+            i++
+          }
+        }
+        if (price <= bids_prices[0] )
+        {
+          message = "You are not the highest buy order. Your order will be completed after the higher buy orders complete or are cancelled."
+        } else {
+          for (order of orders){
+            if (!order.buy_order && order.price <= price){
+              message = "You have a sell order that's greater in price than this buy order. Please cancel that order first."
+              $('input[type="submit"]').attr('disabled','disabled');
+              total = "";
+            }
+          }
+        }
+        if (!message && price >= asks_prices[0]){
+          message = "Your order is higher than some sell orders. You will first complete these orders, then, if there are any shares remaining in your order, you will place a buy order for the remainder."
+        }
+
+        $("#pricingnotice").text(message);
+      } else {
+        while(shares){
+          if (price > bids_prices[i] || !bids_prices[i]){
+            total += shares*price
+            break;
+          }
+          if (shares<bids[bids_prices[i]]){
+            total += bids_prices[i]*shares
+            break;
+          } else {
+            shares -= bids[bids_prices[i]]
+            total += bids[bids_prices[i]]*bids_prices[i]
+            i++
+          }
+        }
+        if (price >= asks_prices[0] )
+        {
+          message = "You are not the lowest sell order. Your order will be completed after the lower sell orders complete or are cancelled."
+        } else {
+          for (order of orders){
+            if (order.buy_order && order.price <= price){
+              message = "You have a buy order that's lower in price than this sell order. Please cancel that order first."
+              $('input[type="submit"]').attr('disabled','disabled');
+              total = "";
+            }
+          }
+        }
+        if (!message && price <= bids_prices[0]){
+          message = "Your order is lower than some buy orders. You will first complete these orders, then, if there are any shares remaining in your order, you will place a sell order for the remainder."
+        }
+
+        $("#pricingnotice").text(message);
+      }
+      $("#total").val(total)
+    }
+
+      $(document).ready(function(){
+        getAsks();
+        getBids();
+        getOrders();
+        $(".updatetotal").change(updatePrices)
+        $('input[type="submit"]').click(function(){
+
+            $('#total').removeAttr('disabled');
+        })
+      })
+
+    </script>
+  </head>
+  <body>
+    <a href="/trading">Home</a>
+    <a href="/logout">Log Out</a>
+    <div class="company">
+      <h1>{{company.name}}</h1>
+      <h3>Industries:</h3>
+      {%for industry in company.industries.all%}
+        <h5>{{industry.parent.name}} &gt; {{industry.name}}</h5>
+      {%endfor%}
+      <br>
+      <form class="" action="place_order" method="post">
+        {%csrf_token%}
+        Place a new order:
+        Type: <select class="updatetotal" id="type" name="type">
+          <option value="-----" selected disabled>-----</option>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+        Shares: <input class="updatetotal" id="shares" type="number" min="1" name="shares" value="">
+        Price: $<input class="updatetotal" id="price" type="number" min="1" name="price" value="">
+        Total: $<input id="total" type="number" name="total" value="" disabled>
+        <br>
+        <span id=pricingnotice></span>
+        <br>
+        <input type="submit" name="name" value="Place Order">
+      </form>
+      <br>
+        <h3>Your open orders for this company:</h3>
+        <table>
+          <thead>
+            <th>
+              Type
+            </th>
+            <th>
+              Shares
+            </th>
+            <th>
+              Price Per Share
+            </th>
+            <th>
+              Total Cost
+            </th>
+            <th>
+              Placed On
+            </th>
+            <th>
+
+            </th>
+          </thead>
+          <tbody id=ordersbody>
+            <span class="orderswait">Retrieving data...</span>
+          </tbody>
+        </table>
+        <span class="ordersnone" hidden="true"><h3>You have no open orders for this company.</h3></span>
+    </div>
+    <div class="trades">
+      <div class="bids">
+        <h1>Bids:</h1>
+        <table>
+          <thead>
+            <th>
+              Price
+            </th>
+            <th>
+              Shares
+            </th>
+          </thead>
+          <tbody id=bidsbody>
+            <span class="bidswait">Retrieving data...</span>
+            <span class="bidsnone" hidden="true">There are no open buy orders for this company.</span>
+          </tbody>
+        </table>
+      </div>
+      <div class="asks">
+        <h1>Asks:</h1>
+        <table>
+          <thead>
+            <th>
+              Price
+            </th>
+            <th>
+              Shares
+            </th>
+          </thead>
+          <tbody id=asksbody>
+            <span class="askswait">Retrieving data...</span>
+            <span class="asksnone" hidden="true">There are no open sell orders for this company.</span>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,153 @@
+      = Minimum Viable Product
+*     = First round of improvements: History displays, user info
+**    = Second round of improvements: Dividends, short selling, company profitability, admins
+***   = Third round of improvements: Event system
+****  = Fourth round of improvements: Minor tweaks
+
+
+Website
+  Login/Registration
+    Login with email, but display username in app
+    Prevent duplicate users along both email and username
+  User info page*
+    Displays username, money, shares, net worth
+    Displays past performance
+    Different for own user
+      Permits changing username, pass
+      Permits taking out loan (Automatic?)*
+        Loan interest depends on prior performance****
+  Main Page:
+    Displays list of companies, ordered by symbol
+    Displays current ask/bid of companies
+    Displays recent news***
+    Displays list of users, ordered by current net worth*
+    Displays current user's portfolio and orders
+  News Page:***
+    Displays past news, ordered by date
+    Allows filtering by company
+    Allows filtering by owned companies
+  Company Page:
+    Displays current ask/bid
+    Displays ask/bid history*
+    Displays other waiting offers
+    Allows making new offers
+    Displays past news, ordered by date***
+    Allows cancelling outstanding offers of current user
+    Displays predicted dividend value**
+    Displays industries company belongs to
+  User list page*
+    Displays list of users, sorted by net worth
+  Help page****
+    Explains uncommon terms
+    Explains interface
+  Ticker****
+    Displays a running ticker somewhere on the page; remains there between pages.
+      If possible, ticker updates live.
+      Ticker shows either latest trades or latest prices, I'm undecided.
+Companies
+  Have a name
+    Name is procedurally generated
+  Have a unique stock symbol, based on name
+  Belong to one or more industries
+    Industries describe the company, and determine what events affect it.***
+    Industries partially depend on name, with random growth outwards
+  Have 10000 shares, given to new players 10/player. 5000 are "owned" by the company, and can't be obtained. (Implicit 500 player cap, doesn't matter due to low expected # of players.)
+    Shares pay dividends based on calculated profit. (Profit is divided among all shares evenly, unowned "player" shares pay no dividends anywhere)**
+      Dividends immediately cause all buy/sell orders to drop by dividend price, or cancel if it's negative
+      Company receives remaining profit (unsold shares) to their funds.
+  Have a "bank" of funds**
+    If the bank drops below 0, company takes out loan, pays interest on loan.
+      This immediately generates a "Dire Financial Straits" event.***
+        "Dire Financial Straits" event causes a moderate loss of confidence in the company
+    If the bank hits -20% of their starting cash, company enters bankruptcy.
+      Bankruptcy causes funds to go to 0
+      Bankruptcy causes expenses for that quarter to be 0
+      Bankruptcy causes dividends to be halved for that quarter
+      Bankruptcy generates a "Bankruptcy" event.***
+        "Bankruptcy" event causes major loss of confidence in the company, minor loss in the company's industry, and a miniscule loss globally
+        "Bankruptcy" event can cause a hit to profits of other companies, depending on industries
+      A second bankruptcy within one year causes company to close, making all shares worthless.
+        This generates a "Company Closed" event***
+          "Company Closed" event causes moderate loss of confidence in the company's industry, and a minor loss globally
+          "Company Closed" event can cause a hit to profits of other companies, depending on industries
+      Starting cash depends on industry**
+      Pays expenses after earning profits, quarterly (1.5 days real-time)
+        Profits and expenses are calculated depending on events and a pre-determined profitability value, derived partially by industry
+    Perform a stock split if stock price trades too high***
+      Blocking issue: Define "too high"
+      All players double their amount of stock
+      All outstanding orders halve their price and double their amount
+      Generates a "Stock Split" event
+        Produces minor raise in confidence for company
+
+Users
+  Have a username that identifies them
+  Have a portfolio of shares and funds
+    Receive dividends based on portfolio**
+  Have a ranking based on net worth*
+
+Admins**
+  Are a User in full
+  Do not appear in the rankings, and have an infinite balance
+  Should not be playing normally; a separate account should be used for regular play
+  May have a duplicate email with a standard user
+  Can create new companies
+  Can change a company's industries
+  Can change a company's profit/expenses
+  Can obtain stocks from the "new user reserve" for free
+  Can modify other users' data
+  Can modify other users' money
+  Can cancel other users' offers
+  Can force a user to make an offer
+  Can trigger a positive or negative event***
+  Admin behavior creates an "act of god" event***
+    Normally, this event has no effect on confidences; it is merely to inform the users that an admin has acted.
+    If the admin chose to deliberately trigger an event, the event has the admin-specified effects on confidences.
+      The admin can not both boost and impair confidences with one event
+    If the admin affects profit, then confidences are affected like any other profit-modifying event
+      This is to prevent the AI player's confidences from being out of line with the expected profit.
+
+
+AI Users
+  Are a User in full
+  Have a "confidence" globally, per industry, and per company
+    Confidence determines whether they buy, sell, or hold, and at what price
+    Confidence depends on events(***) and pre-generated preferences
+      AI users have a "preference" for each industry that determines whether they're inclined to buy or sell in that industry
+    Confidence depends on stock history
+      Different AI users use different algorithms to determine confidence based on history
+  Username is randomly-selected
+    Instead, username depends on confidence algorithm and preferences****
+  Receive an extra in-game month to set up the market before normal users can trade.
+
+Orders
+  Are either buy or sell
+    Buy orders deduct funds on creation, and return shares when completed
+    Sell orders set aside shares on creation, and return cash when completed
+      Sell orders permit "selling short", selling unowned shares**
+        Short sell orders must have a equivalent "Buy" order within one in-game year from being fulfilled
+          This order will immediately be created and fulfilled at the current price if the time limit expires
+            If there are insufficient shares available, ??? (blocks Short Sell until defined)
+          If an automatic purchase requires more funds than are available, takes out a loan to cover the difference
+        Short sell orders pay negative dividends on the missing shares
+          If there aren't enough funds, a loan covers the difference
+  Immediately fulfil when an order of the other type is created at the same or better price
+    Actual price is the price of whichever order was earlier
+  May be cancelled by the creator as long as they haven't been fulfilled
+
+Events***
+  Are randomly generated out of a list
+  Have a description that gives clues to their effects on the companies
+  Can cause confidence in companies to shift
+  Can affect profitability or expenses
+  Affect a single company, an industry, or all companies
+    One event can affect multiple groups differently
+  Can also be generated by in-game effects
+    So far, only "Dire Financial Straits", "Bankruptcy", "Company Closed", "Stock Split" and "Act of God" are generated by effects
+  Target companies/industries randomly, but can be influenced by other events
+  Have a chance of not actually occurring, influenced by past events.
+
+Game end****
+  After a pre-determined amount of time, (2 in-game years/12 days?) game ends and regenerates world
+  Prior history is visible on a separate "past games" page
+  Winner is announced to everyone on next login.

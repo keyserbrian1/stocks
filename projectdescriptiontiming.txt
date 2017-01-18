@@ -1,0 +1,148 @@
+
+Website |  |  |  |  |
+  Login/Registration | done | done | done | done | done
+    Login with email, but display username in app | done | done | done | done | done
+    Prevent duplicate users along both email and username | done | done | done | done | done
+  User info page | n/a |  | done | done |
+    Displays username, money, shares, net worth | n/a |  | done | done | done
+    Displays past performance | n/a |  | done | done | done
+    Different for own user | n/a |  | done | done |
+      Permits changing username, pass | n/a |  | done | done | done
+      Permits taking out loan (Automatic?) | n/a |  | done | done |
+        Loan interest depends on prior performance | n/a | n/a | n/a | n/a |
+  Main Page: |  | done | done |  | done
+    Displays list of companies, ordered by symbol | done | done | done | done | done
+    Displays current ask/bid of companies | done | done | done | done | done
+    Displays recent news | n/a | n/a | n/a |  | done
+    Displays list of users, ordered by current net worth | n/a |  | done | done | done
+    Displays current user's portfolio and orders | done | done | done | done | done
+  News Page: | n/a | n/a | n/a |  | done
+    Displays past news, ordered by date | n/a | n/a | n/a |  | done
+    Allows filtering by company | n/a | n/a | n/a |  | done
+    Allows filtering by owned companies | n/a | n/a | n/a |  | done
+  Company Page: |  |  |  |  |
+    Displays current ask/bid |  | done | done | done | done
+    Displays ask/bid history | n/a |  | done | done | done
+    Displays other waiting offers |  | done | done | done | done
+    Allows making new offers |  | done | done | done | done
+    Displays past news, ordered by date | n/a | n/a | n/a |  | done
+    Allows cancelling outstanding offers of current user |  | done | done | done | done
+    Displays predicted dividend value | n/a | n/a |  | done | done
+    Displays industries company belongs to | done | done | done | done | done
+  User list page | n/a |  | done | done | done
+    Displays list of users, sorted by net worth | n/a |  | done | done | done
+  Help page | n/a | n/a | n/a | n/a |
+    Explains uncommon terms | n/a | n/a | n/a | n/a |
+    Explains interface | n/a | n/a | n/a | n/a |
+  Ticker | n/a | n/a | n/a | n/a |
+    Displays a running ticker somewhere on the page; remains there between pages. | n/a | n/a | n/a | n/a |
+      If possible, ticker updates live. | n/a | n/a | n/a | n/a |
+      Ticker shows either latest trades or latest prices, I'm undecided. | n/a | n/a | n/a | n/a |
+Companies | done |  |  |  |
+  Have a name | done | done | done | done | done
+    Name is procedurally generated | done | done | done | done | done
+  Have a unique stock symbol, based on name | done | done | done | done | done
+  Belong to one or more industries | done | done | done |  | done
+    Industries describe the company, and determine what events affect it. | n/a | n/a | n/a |  | done
+    Industries partially depend on name, with random growth outwards | done | done | done | done | done
+  Have 10000 shares, given to new players 10/player. 5000 are "owned" by the company, and can't be obtained. (Implicit 500 player cap, doesn't matter due to low expected # of players.) | done | done |  | done | done
+    Shares pay dividends based on calculated profit. (Profit is divided among all shares evenly, unowned "player" shares pay no dividends anywhere) | n/a | n/a |  | done | done
+      Dividends immediately cause all buy/sell orders to drop by dividend price, or cancel if it's negative | n/a | n/a |  | done | done
+      Company receives remaining profit (unsold shares) to their funds. | n/a | n/a |  | done | done
+  Have a "bank" of funds | n/a | n/a |  |  | done
+    If the bank drops below 0, company takes out loan, pays interest on loan. | n/a | n/a |  |  | done
+      This immediately generates a "Dire Financial Straits" event. | n/a | n/a | n/a |  | done
+        "Dire Financial Straits" event causes a moderate loss of confidence in the company | n/a | n/a | n/a |  | done
+    If the bank hits -20% of their starting cash, company enters bankruptcy. | n/a | n/a |  |  | done
+      Bankruptcy causes funds to go to 0 | n/a | n/a |  |  | done
+      Bankruptcy causes expenses for that quarter to be 0 | n/a | n/a |  |  | done
+      Bankruptcy causes dividends to be halved for that quarter | n/a | n/a |  |  | done
+      Bankruptcy generates a "Bankruptcy" event. | n/a | n/a | n/a |  | done
+        "Bankruptcy" event causes major loss of confidence in the company, minor loss in the company's industry, and a miniscule loss globally | n/a | n/a | n/a |  | done
+        "Bankruptcy" event can cause a hit to profits of other companies, depending on industries | n/a | n/a | n/a |  | done
+      A second bankruptcy within one year causes company to close, making all shares worthless. | n/a | n/a |  |  | done
+        This generates a "Company Closed" event | n/a | n/a | n/a |  | done
+          "Company Closed" event causes moderate loss of confidence in the company's industry, and a minor loss globally | n/a | n/a | n/a |  | done
+          "Company Closed" event can cause a hit to profits of other companies, depending on industries | n/a | n/a | n/a |  | done
+      Starting cash depends on industry | n/a | n/a |  | done | done
+      Pays expenses after earning profits, quarterly (1.5 days real-time) | n/a | n/a |  | done | done
+        Profits and expenses are calculated depending on events and a pre-determined profitability value, derived partially by industry | n/a | n/a |  |  | done
+    Perform a stock split if stock price trades too high | n/a | n/a | n/a |  | done
+      Blocking issue: Define "too high" | n/a | n/a | n/a |  | done
+      All players double their amount of stock | n/a | n/a | n/a |  | done
+      All outstanding orders halve their price and double their amount | n/a | n/a | n/a |  | done
+      Generates a "Stock Split" event | n/a | n/a | n/a |  | done
+        Produces minor raise in confidence for company | n/a | n/a | n/a |  | done
+
+Users | done |  |  | done | done
+  Have a username that identifies them | done | done | done | done | done
+  Have a portfolio of shares and funds | done | done | done | done | done
+    Receive dividends based on portfolio | n/a | n/a |  | done | done
+  Have a ranking based on net worth | n/a |  | done | done | done
+
+Admins | n/a | n/a |  |  | done
+  Are a User in full | n/a | n/a |  | done | done
+  Do not appear in the rankings, and have an infinite balance | n/a | n/a |  | done | done
+  Should not be playing normally; a separate account should be used for regular play | n/a | n/a |  | done | done
+  May have a duplicate email with a standard user | n/a | n/a |  | done | done
+  Can create new companies | n/a | n/a |  | done | done
+  Can change a company's industries | n/a | n/a |  | done | done
+  Can change a company's profit/expenses | n/a | n/a |  |  | done
+  Can obtain stocks from the "new user reserve" for free | n/a | n/a |  | done | done
+  Can modify other users' data | n/a | n/a |  | done | done
+  Can modify other users' money | n/a | n/a |  | done | done
+  Can cancel other users' offers | n/a | n/a |  | done | done
+  Can force a user to make an offer | n/a | n/a |  | done | done
+  Can trigger a positive or negative event | n/a | n/a | n/a |  | done
+  Admin behavior creates an "act of god" event | n/a | n/a | n/a |  | done
+    Normally, this event has no effect on confidences; it is merely to inform the users that an admin has acted. | n/a | n/a | n/a |  | done
+    If the admin chose to deliberately trigger an event, the event has the admin-specified effects on confidences. | n/a | n/a | n/a |  | done
+      The admin can not both boost and impair confidences with one event | n/a | n/a | n/a |  | done
+    If the admin affects profit, then confidences are affected like any other profit-modifying event | n/a | n/a | n/a |  | done
+      This is to prevent the AI player's confidences from being out of line with the expected profit. | n/a | n/a | n/a |  | done
+
+
+AI Users |  | done | done |  |
+  Are a User in full |  | done | done | done | done
+  Have a "confidence" globally, per industry, and per company |  | done | done |  | done
+    Confidence determines whether they buy, sell, or hold, and at what price |  | done | done | done | done
+    Confidence depends on events | n/a | n/a | n/a |  |
+    Confidence depends on pre-generated preferences |  | done | done | done | done
+      AI users have a "preference" for each industry that determines whether they're inclined to buy or sell in that industry |  | done | done | done | done
+    Confidence depends on stock history |  | done | done | done | done
+      Different AI users use different algorithms to determine confidence based on history |  | done | done | done | done
+  Username is randomly-selected |  | done | done | done |
+    Instead, username depends on confidence algorithm and preferences | n/a | n/a | n/a | n/a |
+  Receive an extra in-game month to set up the market before normal users can trade. |  | done | done | done | done
+
+Orders | done | done |  | done | done
+  Are either buy or sell | done | done |  | done | done
+    Buy orders deduct funds on creation, and return shares when completed | done | done | done | done | done
+    Sell orders set aside shares on creation, and return cash when completed | done | done |  | done | done
+      Sell orders permit "selling short", selling unowned shares | n/a | n/a |  | done | done
+        Short sell orders must have a equivalent "Buy" order within one in-game year from being fulfilled | n/a | n/a |  | done | done
+          This order will immediately be created and fulfilled at the current price if the time limit expires | n/a | n/a |  | done | done
+            If there are insufficient shares available, ??? (blocks Short Sell until defined) | n/a | n/a |  | done | done
+          If an automatic purchase requires more funds than are available, takes out a loan to cover the difference | n/a | n/a |  | done | done
+        Short sell orders pay negative dividends on the missing shares | n/a | n/a |  | done | done
+          If there aren't enough funds, a loan covers the difference | n/a | n/a |  | done | done
+  Immediately fulfil when an order of the other type is created at the same or better price | done | done | done | done | done
+    Actual price is the price of whichever order was earlier | done | done | done | done | done
+  May be cancelled by the creator as long as they haven't been fulfilled | done | done | done | done | done
+
+Events | n/a | n/a | n/a |  | done
+  Are randomly generated out of a list | n/a | n/a | n/a |  | done
+  Have a description that gives clues to their effects on the companies | n/a | n/a | n/a |  | done
+  Can cause confidence in companies to shift | n/a | n/a | n/a |  | done
+  Can affect profitability or expenses | n/a | n/a | n/a |  | done
+  Affect a single company, an industry, or all companies | n/a | n/a | n/a |  | done
+    One event can affect multiple groups differently | n/a | n/a | n/a |  | done
+  Can also be generated by in-game effects | n/a | n/a | n/a |  | done
+    So far, only "Dire Financial Straits", "Bankruptcy", "Company Closed", "Stock Split" and "Act of God" are generated by effects | n/a | n/a | n/a |  | done
+  Target companies/industries randomly, but can be influenced by other events | n/a | n/a | n/a |  | done
+  Have a chance of not actually occurring, influenced by past events. | n/a | n/a | n/a |  | done
+
+Game end | n/a | n/a | n/a | n/a |
+  After a pre-determined amount of time, (2 in-game years/12 days?) game ends and regenerates world | n/a | n/a | n/a | n/a |
+  Prior history is visible on a separate "past games" page | n/a | n/a | n/a | n/a |
+  Winner is announced to everyone on next login. | n/a | n/a | n/a | n/a |

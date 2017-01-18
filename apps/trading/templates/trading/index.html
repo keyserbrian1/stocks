@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+{%load trading%}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('#companies').DataTable(
+          {
+            paging: false,
+            scrollY: 400
+          }
+        );
+        var width = $(window).width()
+        $('table.user').DataTable(
+          {
+            paging: false,
+            scrollY: 400,
+            "language": {
+              "emptyTable": "You do not have any open trades"
+            }
+          }
+        );
+        $('div.user').css("width",width*.44+"px").css("margin",width*.02+"px")
+      })
+    </script>
+    <style media="screen">
+      .user{
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome, {{response}}!</h1>
+    <a href="/logout">Log Out</a>
+    <table id=companies>
+      <thead>
+        <h1>Market Data:</h1>
+        <th>
+          Symbol
+        </th>
+        <th>
+          Name
+        </th>
+        <th>
+          Bid
+        </th>
+        <th>
+          Ask
+        </th>
+        <th>
+          Last trade
+        </th>
+      </thead>
+      <tbody>
+        {%for company in companies%}
+        <tr>
+          <td>
+            <a href="company/{{company.id}}/">${{company.symbol}}</a>
+          </td>
+          <td>
+            {{company.name}}
+          </td>
+          <td>
+            {{company.bid}}
+          </td>
+          <td>
+            {{company.ask}}
+          </td>
+          <td>
+            {{company.last_trade}}
+          </td>
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+    <div class="user portfolio">
+    <table class="user portfolio" style="width:100%">
+      <thead>
+        <h1>Your Portfolio:</h1>
+        <th>
+          Symbol
+        </th>
+        <th>
+          Name
+        </th>
+        <th>
+          Shares
+        </th>
+        <th>
+          Price Per Share
+        </th>
+        <th>
+          Total Value
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            $CASH
+          </td>
+          <td>
+            Cash on hand
+          </td>
+          <td>
+            {{user_cash}}
+          </td>
+          <td>
+            $1.00
+          </td>
+          <td>
+            {{user_cash | currency}}
+          </td>
+        </tr>
+        {%for stock in user_portfolio%}
+        <tr>
+          <td>
+            <a href="company/{{stock.company_id}}/">${{stock.symbol}}</a>
+          </td>
+          <td>
+            {{stock.name}}
+          </td>
+          <td>
+            {{stock.shares}}
+          </td>
+          <td>
+            {{stock.price | currency}}
+          </td>
+          <td>
+            {{stock.total | currency}}
+          </td>
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+        </div>
+        <div class="user orders">
+    <table class="user orders">
+      <thead>
+        <h1>Your Open Offers:</h1>
+        <th>
+          Symbol
+        </th>
+        <th>
+          Name
+        </th>
+        <th>
+          Type
+        </th>
+        <th>
+          Shares
+        </th>
+        <th>
+          Price Per Share
+        </th>
+        <th>
+          Total Cost
+        </th>
+        <th>
+          Placed On
+        </th>
+      </thead>
+      <tbody>
+        {%for order in user_orders%}
+        <tr>
+          <td>
+            <a href="company/{{order.company.id}}/">${{order.company.symbol}}</a>
+          </td>
+          <td>
+            {{order.company.name}}
+          </td>
+          <td>
+            {%if order.buy_order%}
+              Buy
+            {%else%}
+              Sell
+            {%endif%}
+          </td>
+          <td>
+            {{order.shares}}
+          </td>
+          <td>
+            {{order.price | currency}}
+          </td>
+          <td>
+            {{order.total | currency}}
+          </td>
+          <td>
+            {{order.created_at}}
+          </td>
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+        </div>
+  </body>
+</html>
