@@ -1,6 +1,6 @@
-from ...models import Company, Industry, Company_industries
+from ...models import Company, Industry, Company_industries, Stock
 
-from .... import trading
+from .... import users
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -16,11 +16,12 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        users.models.Bot.objects.all().delete() #delete all the bots, to regen them.
         make_industries()
         make_companies()
-        for user in trading.models.User.objects.all():
+        for user in users.models.User.objects.all():
             for company in Company.objects.all():
-                Stock(company=company, owner=user, shares=10).save()
+                Stock(company=company, owner=user, shares=100).save()
 
 
 industry_from_name={"Telecom": "Telephony","Software": "Software","Technology": "Technology","Hardware": "Hardware","Electronics": "Technology","Consulting": "Consulting","General": "Generic","Frontier": "Generic","Alpha": "Generic","Industries": "Manufacturing","Net": "Software","People": "Generic","Star": "Generic","Bell": "Telephony","Research": "Generic","Architecture": "Manufacturing","Building": "Construction","Construction": "Construction","Medicine": "Medical","Hill": "Generic","Graphics": "Graphical Design","Analysis": "Consulting","Vision": "Generic","Contract": "Consulting","Solutions": "Generic","Advanced": "Generic","Venture": "Generic","Innovation": "Generic","Systems": "Technology","Solutions": "Generic","Provider": "Generic","Design": "Design","Internet": "Technology","Virtual": "Software","Vision": "Generic","Application": "Generic","Signal": "Technology","Network": "Technology","Net": "Technology","Data": "Software","Electronic": "Technology","Max": "Generic","Adventure": "Generic","Atlantic": "Generic","Pacific": "Generic","North": "Generic","East": "Generic","South": "Generic","West": "Generic","Speed": "Generic","Universal": "Generic","Galaxy": "Generic","Future": "Generic","Digital": "Software","Studio": "Generic","Interactive": "Software","Source": "Generic","Omega": "Generic","Direct": "Generic","Resource": "Generic","Power": "Generic","Federated": "Generic","Star": "Generic"}
@@ -94,9 +95,9 @@ def make_companies():
                 industries = get_industries_from_split_name(namesplit)
             try:
                 company = Company(name=name, symbol=symbol)
+                company.save()
                 if "Consulting" in industries:
                     industries.remove("Consulting")
-                    company.save()
                     Company_industries(company=company, industry=Industry.objects.get(name="Consulting")).save()
                 if not len(industries):
                     industries.append("Generic")

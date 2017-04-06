@@ -61,7 +61,6 @@ class Company(models.Model):
 class StockManager(models.Manager):
     def getUserPortfolio(self, user_id):
         result = self.raw('select stocks.id, companies.id as company_id, companies.name, companies.symbol, stocks.shares, (select orders.price from trading_order as orders where orders.company_id==companies.id and orders.open==0 order by orders.created_at limit 1) as price, (stocks.shares*(select orders.price from trading_order as orders where orders.company_id==companies.id and orders.open==0 order by orders.created_at limit 1)) as total from trading_stock as stocks join trading_company as companies on stocks.company_id = companies.id where stocks.owner_id='+str(user_id))
-        print list(result)
         return result
 
 class Stock(models.Model):
